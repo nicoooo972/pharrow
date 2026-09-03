@@ -1,0 +1,19 @@
+[package]
+name = "phast"
+version = "0.1.0"
+authors = ["Nicolas Lebozec <nicolas.lebozec73@gmail.com>"]
+description = "Runner de tests compatible avec le format d'écriture PHPUnit, sans dépendre du paquet composer phpunit/phpunit."
+license = "MIT OR Apache-2.0"
+edition = "2024"
+
+[[bin]]
+name = "phast"
+path = "src/main.rs"
+
+[dependencies]
+
+
+[profile.release]
+lto = true
+strip = true
+codegen-units = 1
