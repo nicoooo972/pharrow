@@ -1,6 +1,6 @@
 [package]
 name = "pharrow"
-version = "0.0.0"
+version = "0.1.0"
 authors = ["Nicolas Lebozec <nicolas.lebozec73@gmail.com>"]
 description = "Runner de tests compatible avec le format d'écriture PHPUnit, sans dépendre du paquet composer phpunit/phpunit."
 license = "MIT OR Apache-2.0"
