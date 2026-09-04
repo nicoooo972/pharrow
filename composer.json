@@ -11,6 +11,15 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=8.1"
+        "php": ">=8.2"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PHPUnit\\Framework\\": "src/Framework/",
+            "Pharrow\\Runner\\": "src/Runner/"
+        }
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.0"
     }
 }

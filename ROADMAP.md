@@ -1,114 +1,112 @@
 # Roadmap
 
-Ce document tient lieu d'issues tant que le dépôt n'est pas encore poussé sur
-GitHub. Chaque ticket ci-dessous deviendra une issue GitHub telle quelle
-(titre + description + critères d'acceptation) le jour venu.
+This document stands in for issues while the repository is not yet pushed to
+GitHub. Each ticket below will become a GitHub issue as is (title,
+description, acceptance criteria) once that happens.
 
-## Objectif du projet
+## Project goal
 
-Un runner de tests compatible avec le **format d'écriture des tests
-PHPUnit** (classes qui étendent `TestCase`, méthodes `testXxx()`,
-`assertEquals()`, `setUp()`/`tearDown()`, `@dataProvider`...), mais qui
-n'a **plus de dépendance sur le paquet composer `phpunit/phpunit`** :
-on exécute nos tests avec notre propre "harness" PHP minimal, toujours
-lancé par le vrai binaire `php` (pas de VM/interpréteur maison — voir la
-section "Ambition long terme" en bas).
+A test runner compatible with the PHPUnit test writing format (classes that
+extend `TestCase`, `testXxx()` methods, `assertEquals()`,
+`setUp()`/`tearDown()`, `@dataProvider`, and so on), but with no dependency
+on the `phpunit/phpunit` composer package. Tests run through our own minimal
+PHP harness, always launched by the real `php` binary (no homemade VM or
+interpreter; see the "Long term ambition" section below).
 
-L'orchestrateur Rust existant (découverte des fichiers `*Test.php`,
-répartition en lots équilibrés par durée, parallélisation, agrégation des
-résultats) est conservé : il n'a pas besoin de connaître PHPUnit, il lui
-suffit qu'un process PHP produise un rapport exploitable par fichier.
+The existing Rust orchestrator (discovering `*Test.php` files, splitting them
+into balanced batches by duration, running them in parallel, aggregating
+results) stays as it is. It doesn't need to know anything about PHPUnit, it
+just needs a PHP process to produce a report it can parse per file.
 
-## Décision de scope (2026-09-03)
+## Scope decision (2026-09-03)
 
-Deux niveaux étaient envisagés :
-1. **Retenu** : remplacer uniquement le paquet `phpunit/phpunit` par un
-   harness PHP maison, en gardant `php` comme moteur d'exécution.
-2. Écarté pour l'instant : remplacer aussi `php` lui-même par un
-   interpréteur écrit en Rust. Aucun projet Rust n'est jamais allé
-   jusqu'à l'exécution réelle de PHP (Tagua VM archivé en 2019, resté au
-   stade parser ; PXP abandonné en 2024 par épuisement de son mainteneur
-   solo). Cette option reste un objectif long terme possible si le
-   projet attire des contributeurs, mais ne doit pas bloquer un premier
-   livrable utile.
+Two levels were considered:
+1. Chosen: replace only the `phpunit/phpunit` package with a homemade PHP
+   harness, keeping `php` as the execution engine.
+2. Set aside for now: also replace `php` itself with an interpreter written
+   in Rust. No Rust project has ever reached actual PHP execution (Tagua VM
+   was archived in 2019, still at the parser stage; PXP was abandoned in
+   2024 when its solo maintainer ran out of steam). This option remains a
+   possible long term goal if the project attracts contributors, but it
+   shouldn't block shipping something useful first.
 
-## Jalons
+## Milestones
 
-### v0.1.0 — Harness minimal viable
-Premier test PHPUnit-like qui tourne de bout en bout sans
-`phpunit/phpunit` installé.
+### v0.1.0, Minimal viable harness
+First PHPUnit like test running end to end with `phpunit/phpunit` not
+installed.
 
-- [x] **#1 Choisir le nom définitif du projet.** 
+- [x] **#1 Pick the final project name.**
 
-- [ ] **#2 Classe `TestCase` maison** (PHP). Propriétés/méthodes minimales :
-  constructeur, `setUp()`/`tearDown()` appelés automatiquement autour de
-  chaque test, une méthode `run()` qui exécute une méthode `testXxx`
-  donnée et capture succès/échec/exception.
-- [ ] **#3 Jeu d'assertions de base** (PHP) : `assertEquals`, `assertSame`,
+- [ ] **#2 Homemade `TestCase` class** (PHP). Minimal properties/methods:
+  constructor, `setUp()`/`tearDown()` called automatically around each test,
+  a `run()` method that executes a given `testXxx` method and captures
+  success, failure, or exception.
+- [ ] **#3 Basic assertion set** (PHP): `assertEquals`, `assertSame`,
   `assertTrue`, `assertFalse`, `assertNull`, `assertNotNull`, `assertCount`,
-  `assertInstanceOf`. Chaque échec d'assertion lève une exception dédiée
-  (ex. `AssertionFailedException`) portant message + fichier + ligne.
-- [ ] **#4 Autoloader/bootstrap du harness.** Script PHP (invoqué par le
-  Rust à la place de `vendor/bin/phpunit`) qui : charge l'autoload
-  composer du projet cible (PSR-4, pour que les classes de test et le code
-  applicatif se chargent), inclut le fichier de test reçu en argument,
-  découvre par réflexion les méthodes `public function testXxx()`, les
-  exécute une à une via `TestCase::run()`.
-- [ ] **#5 Format de rapport machine-lisible.** Le harness doit produire un
-  rapport que le binaire Rust peut parser. Réutiliser le format JUnit XML
-  déjà consommé par `parse_junit()` dans `main.rs` pour ne pas toucher à
-  l'orchestrateur — ou définir un format plus simple (JSON ligne par
-  ligne) si plus simple à générer côté PHP ; à trancher au moment de
-  coder #4/#5 ensemble.
-- [ ] **#6 Adapter `main.rs`** pour invoquer le nouveau harness (chemin du
-  script bootstrap) au lieu de chercher `vendor/bin/phpunit`. Supprimer
-  `find_phpunit_bin()` une fois le harness posé.
-- [ ] **#7 Test de bout en bout.** Un fichier `ExampleTest.php` minimal (une
-  classe, une méthode `testXxx`, une assertion) qui passe et un qui échoue
-  intentionnellement, vérifiés manuellement puis via un test d'intégration
-  Rust (`tests/tests.rs`, cf. #12).
+  `assertInstanceOf`. Each failed assertion throws a dedicated exception
+  (e.g. `AssertionFailedException`) carrying a message, file, and line.
+- [ ] **#4 Harness autoloader/bootstrap.** A PHP script (invoked by the Rust
+  side instead of `vendor/bin/phpunit`) that loads the target project's
+  composer autoload (PSR-4, so test classes and application code can be
+  loaded), includes the test file received as an argument, discovers
+  `public function testXxx()` methods through reflection, and runs them one
+  by one through `TestCase::run()`.
+- [ ] **#5 Machine readable report format.** The harness must produce a
+  report the Rust binary can parse. Either reuse the JUnit XML format
+  already consumed by `parse_junit()` in `main.rs` to avoid touching the
+  orchestrator, or define a simpler format (line delimited JSON) if that
+  turns out easier to generate on the PHP side. To be decided when #4/#5
+  are actually being built.
+- [ ] **#6 Update `main.rs`** to invoke the new harness (bootstrap script
+  path) instead of looking for `vendor/bin/phpunit`. Remove
+  `find_phpunit_bin()` once the harness is in place.
+- [ ] **#7 End to end test.** A minimal `ExampleTest.php` (one class, one
+  `testXxx` method, one assertion) that passes, plus one that fails on
+  purpose, checked manually and then through a Rust integration test
+  (`tests/tests.rs`, see #12).
 
-### v0.2.0 — Couverture fonctionnelle courante
-- [ ] **#8 `@dataProvider` / `#[DataProvider]`.** Support des deux syntaxes
-  (annotation docblock historique et attribut PHP 8). Un test avec
-  provider doit apparaître comme N cas distincts dans le rapport.
+### v0.2.0, Common functional coverage
+- [ ] **#8 `@dataProvider` / `#[DataProvider]`.** Support both syntaxes (the
+  historical docblock annotation and the PHP 8 attribute). A test with a
+  provider must show up as N distinct cases in the report.
 - [ ] **#9 `expectException()` / `expectExceptionMessage()`.**
-- [ ] **#10 Tests marqués skip/incomplete** (`markTestSkipped`,
+- [ ] **#10 Skipped/incomplete tests** (`markTestSkipped`,
   `markTestIncomplete`).
-- [ ] **#11 Assertions étendues** : `assertStringContainsString`,
+- [ ] **#11 Extended assertions**: `assertStringContainsString`,
   `assertArrayHasKey`, `assertGreaterThan`/`assertLessThan`,
   `assertMatchesRegularExpression`, `assertJsonStringEqualsJsonString`.
-  Prioriser celles effectivement utilisées dans mdf-api-full (`grep -r
-  "->assert" tests/` sur ce projet pour objectiver la liste plutôt que
-  deviner).
+  Prioritize the ones actually used in mdf-api-full (run `grep -r
+  "->assert" tests/` on that project to get a real list instead of
+  guessing).
 
-### v0.3.0 — Fiabilité et ergonomie
-- [ ] **#12 Tests d'intégration Rust** (`tests/tests.rs` + fixtures PHP
-  factices dans `tests/testenv/`), suivant la convention fd relevée en
-  recherche — pas de vrai projet Symfony nécessaire pour tester le
-  runner lui-même.
-- [ ] **#13 Messages d'erreur avec contexte** : diff lisible sur
-  `assertEquals` (attendu/obtenu), pas juste "assertion failed".
-- [ ] **#14 Documentation utilisateur** : README avec exemple minimal,
-  liste des assertions supportées vs non supportées (comparé à PHPUnit),
-  pour que des contributeurs sachent où contribuer.
+### v0.3.0, Reliability and ergonomics
+- [ ] **#12 Rust integration tests** (`tests/tests.rs` plus fake PHP
+  fixtures under `tests/testenv/`), following the fd convention found
+  during research. No real Symfony project is needed to test the runner
+  itself.
+- [ ] **#13 Error messages with context**: a readable diff on
+  `assertEquals` (expected vs actual), not just "assertion failed".
+- [ ] **#14 User documentation**: README with a minimal example, list of
+  supported vs unsupported assertions compared to PHPUnit, so contributors
+  know where to help.
 
-### v1.0.0 — Prêt pour contribution externe
-- [ ] **#15 CI GitHub Actions** (fmt + clippy + tests, cf. section
-  recherche : modèle fd `CICD.yml`).
-- [ ] **#16 CONTRIBUTING.md finalisé**, CHANGELOG.md démarré (conventional
-  commits + `release-plz` recommandé par la recherche pour automatiser
-  versioning/CHANGELOG en CI).
-- [ ] **#17 Dogfooding sur mdf-api-full** : remplacer l'usage actuel de
-  `vendor/bin/phpunit` par ce harness sur un sous-ensemble réel de tests
-  fonctionnels, mesurer l'écart de couverture d'assertions.
+### v1.0.0, Ready for external contribution
+- [ ] **#15 GitHub Actions CI** (fmt, clippy, tests; see the research
+  section for the fd `CICD.yml` model).
+- [ ] **#16 Finalized CONTRIBUTING.md**, CHANGELOG.md started (conventional
+  commits plus `release-plz`, recommended by the research to automate
+  versioning and the CHANGELOG in CI).
+- [ ] **#17 Dogfooding on mdf-api-full**: replace the current use of
+  `vendor/bin/phpunit` with this harness on a real subset of functional
+  tests, and measure the gap in assertion coverage.
 
-## Ambition long terme (hors scope actuel, non planifiée)
+## Long term ambition (out of current scope, not planned)
 
-Un interpréteur PHP écrit en Rust, pour ne plus dépendre du binaire `php`
-du tout. Volontairement non planifié en jalons tant que v1.0.0 n'est pas
-atteint : c'est un projet d'une tout autre ampleur (comparable à
-`php-src`/HHVM d'après la recherche menée), et le risque documenté sur les
-tentatives précédentes (PXP, Tagua VM) est l'épuisement d'un mainteneur
-solo — d'où l'intérêt de d'abord livrer quelque chose d'utile et
-contributif avant d'attaquer ça, si jamais.
+A PHP interpreter written in Rust, so the project no longer depends on the
+`php` binary at all. Deliberately left out of the milestones until v1.0.0 is
+reached. This is a project of a completely different scale (comparable to
+`php-src`/HHVM according to the research done), and the documented risk from
+previous attempts (PXP, Tagua VM) is a solo maintainer running out of
+energy. Better to ship something useful and contributable first, before
+tackling this, if it ever happens.
