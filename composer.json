@@ -1,0 +1,16 @@
+{
+    "name": "nicoooo972/pharrow",
+    "description": "Rust-native test runner for PHP, compatible with the PHPUnit test-writing format without depending on the phpunit/phpunit composer package.",
+    "type": "library",
+    "license": ["MIT", "Apache-2.0"],
+    "authors": [
+        {
+            "name": "Nicolas Lebozec",
+            "email": "nicolas.lebozec73@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=8.1"
+    }
+}
