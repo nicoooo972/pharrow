@@ -1,21 +1,21 @@
-<p align="center">phast is a Rust-native test runner for PHP, compatible with the PHPUnit test-writing format without depending on the <code>phpunit/phpunit</code> composer package.</p>
+<p align="center">pharrow is a Rust-native test runner for PHP, compatible with the PHPUnit test-writing format without depending on the <code>phpunit/phpunit</code> composer package.</p>
 
 <p align="center">
   <img alt="Status" src="https://img.shields.io/badge/status-pre--v0.1.0-orange" />
-  <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/nicoooo972/phast"/>
-  <img alt="Github Last Commit" src="https://img.shields.io/github/last-commit/nicoooo972/phast"/>
+  <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/nicoooo972/pharrow"/>
+  <img alt="Github Last Commit" src="https://img.shields.io/github/last-commit/nicoooo972/pharrow"/>
   <img alt="License" src="https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue" />
 </p>
 
 <p align="center">
   <a href="ROADMAP.md">Roadmap</a>
-  · <a href="https://github.com/nicoooo972/phast/issues">Bug reports</a>
+  · <a href="https://github.com/nicoooo972/pharrow/issues">Bug reports</a>
   · <a href="CONTRIBUTING.md">Contributing</a>
 </p>
 
 ---
 
-phast lets you write tests the way you already do with PHPUnit classes extending `TestCase`, `testXxx()` methods, `assertEquals()`, `setUp()`/`tearDown()`, `@dataProvider` but runs them without the `phpunit/phpunit` composer package. Execution goes through a minimal PHP harness that we own, always invoked by the real `php` binary (no custom VM or interpreter : see [Long-term ambition](#long-term-ambition) below).
+pharrow lets you write tests the way you already do with PHPUnit classes extending `TestCase`, `testXxx()` methods, `assertEquals()`, `setUp()`/`tearDown()`, `@dataProvider` but runs them without the `phpunit/phpunit` composer package. Execution goes through a minimal PHP harness that we own, always invoked by the real `php` binary (no custom VM or interpreter : see [Long-term ambition](#long-term-ambition) below).
 
 The Rust orchestrator will handle test-file discovery, duration-balanced batching, and parallel execution; it stays agnostic to PHPUnit internals and only needs a PHP process that produces a report it can parse.
 
@@ -51,16 +51,16 @@ No dedicated docs site yet. For now:
 
 ## Long-term ambition
 
-A PHP interpreter written entirely in Rust, to drop the dependency on the `php` binary itself. Deliberately out of scope until v1.0.0 is reached: it's a project of a different scale (comparable to `php-src`/HHVM), and prior attempts (Tagua VM, PXP) stalled from solo-maintainer burnout. Worth revisiting once phast has delivered something useful and attracted contributors not before.
+A PHP interpreter written entirely in Rust, to drop the dependency on the `php` binary itself. Deliberately out of scope until v1.0.0 is reached: it's a project of a different scale (comparable to `php-src`/HHVM), and prior attempts (Tagua VM, PXP) stalled from solo-maintainer burnout. Worth revisiting once pharrow has delivered something useful and attracted contributors not before.
 
 ## Getting Help
 
-- Open an issue on [GitHub Issues](https://github.com/nicoooo972/phast/issues) for bugs or feature requests.
+- Open an issue on [GitHub Issues](https://github.com/nicoooo972/pharrow/issues) for bugs or feature requests.
 - Check [ROADMAP.md](ROADMAP.md) before asking "is X supported", it tracks exactly what's built vs. planned.
 
 ## Contact
 
-- **Bugs**: [GitHub Issues](https://github.com/nicoooo972/phast/issues)
+- **Bugs**: [GitHub Issues](https://github.com/nicoooo972/pharrow/issues)
 - **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## License
