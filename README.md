@@ -1,4 +1,4 @@
-<p align="center">pharrow is a Rust-native test runner for PHP, compatible with the PHPUnit test-writing format without depending on the <code>phpunit/phpunit</code> composer package.</p>
+<p align="center">pharrow is a fast parallel test runner for PHP. Runs your existing PHPUnit test classes unchanged, with a Rust-powered orchestrator. Pre-alpha, under active development.</p>
 
 <p align="center">
   <img alt="Status" src="https://img.shields.io/badge/status-pre--v0.1.0-orange" />
