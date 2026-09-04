@@ -13,7 +13,7 @@
     "require": {
         "php": ">=8.2"
     },
-    "autoload-dev": {
+    "autoload": {
         "psr-4": {
             "PHPUnit\\Framework\\": "src/Framework/",
             "Pharrow\\Runner\\": "src/Runner/"
